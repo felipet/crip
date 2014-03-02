@@ -7,6 +7,7 @@ SRC=./src
 INC=./include
 OBJ=./obj
 BIN=./bin
+DOC=./doc
 
 # Opciones del compilador
 CXX=clang++
@@ -14,7 +15,7 @@ CXXFLAGS=-std=c++11 -c
 LDFLAGS=
 
 all: $(BIN)/ejemplos
-.PHONY: all clean mrproper
+.PHONY: all clean mrproper doc
 
 $(BIN)/ejemplos: $(OBJ)/main.o $(OBJ)/libcrip.o
 	$(CXX) $(LDFLAGS) $^ -o $@
@@ -26,11 +27,15 @@ $(OBJ)/libcrip.o: $(SRC)/libcrip.cpp $(INC)/libcrip.hpp
 	$(CXX) $(CXXFLAGS) -I$(INC) $< -o $@
 	
 clean:
-	rm $(OBJ)/*
+	@rm -f $(OBJ)/*
 
 mrproper: clean
-	rm $(BIN)/*
+	@echo "Dejando limpito...."
+	@rm -f $(BIN)/*
+	@rm -rf $(DOC)/*
 
+doc:
+	doxygen Doxyfile
 
 
 
