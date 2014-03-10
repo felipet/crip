@@ -12,12 +12,12 @@ DOC=./doc
 # Opciones del compilador
 CXX=clang++
 CXXFLAGS=-std=c++11 -c
-LDFLAGS=
+LDFLAGS=-lboost_program_options
 
 all: $(BIN)/ejemplos
 .PHONY: all clean mrproper doc
 
-$(BIN)/ejemplos: $(OBJ)/main.o $(OBJ)/libcrip.o
+$(BIN)/ejemplos: $(OBJ)/libcrip.o $(OBJ)/main.o
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 $(OBJ)/main.o: $(SRC)/ejemplos.cpp $(SRC)/libcrip.cpp

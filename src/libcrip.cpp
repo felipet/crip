@@ -57,7 +57,6 @@ INT_TYPE mcd_ext(INT_TYPE &a, INT_TYPE &b) {
      if(!cambiados) {
         a = x[2];
         b = y[2];
-        std::cout << "aqui" << std::endl;
      }
      else {
         b = x[2];
@@ -88,10 +87,31 @@ bool inverso(INT_TYPE a, INT_TYPE b, INT_TYPE &inv) {
 
 // ------------------------------------------------------------------
 
-INT_TYPE powermodint(INT_TYPE a, INT_TYPE b, INT_TYPE n) {
-    INT_TYPE aux = 1;
+INT_TYPE potencia_mod(INT_TYPE a, INT_TYPE m, INT_TYPE n) {
+    INT_TYPE b = 1;
     
-    if(!b) return aux;
+    if(!m) return b;
+    
+    // intentar optimizar usando menos operaciones %
+    while(m > 0) {
+        if(m & 0x1)
+            b = (b*a) % n;
+        a = (a*a) % n;
+        m >>= 1;
+    }
+    
+    //b = (b*a) % n;
+    
+    return b;
+}
+
+// ------------------------------------------------------------------
+
+bool es_primo(INT_TYPE p) {
+    
+    if(p < 5 and (p == 3 or p == 2)) return true;
+    if(p & 0x1) return false; // El número es potencia de 2
+    
     
     
 }

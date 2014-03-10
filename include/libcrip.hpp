@@ -44,12 +44,27 @@ INT_TYPE mcd_ext(INT_TYPE &a, INT_TYPE &b);
 bool inverso(INT_TYPE a, INT_TYPE b, INT_TYPE &inv);
 
 /**
- * \brief Calcular a^b mod n
+ * \brief Calcular a^m mod n
  * \param[in] a Base
- * \param[out] b Exponente
+ * \param[out] m Exponente
  * \param[in] n Módulo
+ * \return a^m mod n
+ * \pre m >= 1
+ * \pre n >= 2
  */
-void log_discreto(INT_TYPE a, INT_TYPE &b, INT_TYPE n);
+INT_TYPE potencia_mod(INT_TYPE a, INT_TYPE m, INT_TYPE n);
+
+/**
+ * \brief Test de primalidad Miller-Rabin
+ * Si se quiere aumentar el nivel de certeza para evitar falsos positivos
+ * repetir el algoritmo varias veces. Para números pequeños con 5 iteraciones
+ * se obtiene un buen nivel de certeza, para grandes 10 está bien.
+ * \param[in] p valor por determinar si es primo
+ * \retval false el valor es 100% no primo
+ * \retval true el valor es primo con un % de certeza
+ * \pre p >= 1
+ */
+bool es_primo(INT_TYPE p);
 
 #endif
 
