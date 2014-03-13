@@ -1,0 +1,4 @@
+# ficheros a ignorar por el tracker de git
+obj/**
+bin/**
+doc/**
