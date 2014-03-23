@@ -23,7 +23,8 @@ int main(int argc, char **argv) {
         ("help,h", "Ayuda del programa")
         ("mcd,m", po::value<vector<string> >()->multitoken(), "Calcula el máximo común divisor de varios números")
         ("inverso,i", po::value<vector<string> >()->multitoken(),"Calcula el inverso de un número modulo n")
-        ("pot,p",po::value<vector<string> >()->multitoken(), "Calcula el valor de a^m mod n")
+        ("pot,x",po::value<vector<string> >()->multitoken(), "Calcula el valor de a^m mod n")
+        ("primo,p", po::value<string>(), "Test de primalidad Miller-Rabin")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -114,6 +115,30 @@ int main(int argc, char **argv) {
         else {
             cout << "\tNúmero de parámetros incorrectos" << endl;
             return 1;
+        }
+    }
+    
+    if(!vm["primo"].empty()) {
+        bool p = false;
+        string opc = vm["primo"].as<string>();
+        
+        if(opc.size() > 0) {
+            INT_TYPE value(opc.c_str());
+            
+            if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+            p = es_primo(value);
+            auto t2 = ch::high_resolution_clock::now();
+            
+            cout << "\t" << opc << " ";
+            if(p) cout << "primo\n";
+            else cout << "no es primo\n";
+            
+            if(tiempos)
+                cout << "\tTiempo:\t" << chrono::duration_cast<chrono::milliseconds >
+                (t2 - t1).count() << "ms" << endl;
+            
+            return 0;
         }
     }
     

@@ -23,6 +23,17 @@ typedef int128_t INT_TYPE; //< Plantilla para los enteros
 
 /**
  * \brief Máximo común divisor de dos enteros
+ * Calcula el MCD de dos enteros utilizando el algoritmo de
+ * Euclides.
+ * \param[in] a Entrada del primer entero. 
+ * \param[in] b Entrada del segundo entero.
+ * \return El MCD de a y b.
+ *
+ */
+INT_TYPE mcd(INT_TYPE a, INT_TYPE b);
+
+/**
+ * \brief Máximo común divisor de dos enteros
  * Calcula el MCD de dos enteros utilizando el algoritmo extendido de
  * Euclides. Además resuelve d = ax + by
  * \param[in,out] a Entrada del primer entero, a. Salida de x.

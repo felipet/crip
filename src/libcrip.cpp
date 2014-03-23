@@ -1,6 +1,23 @@
 #include "libcrip.hpp"
+#include <random>
+#include <chrono>
+#include <iostream>
 
 //#DEFINE DEBUG
+
+INT_TYPE mcd(INT_TYPE a, INT_TYPE b) {
+    INT_TYPE r;
+    
+    while(!b) {
+        r = a % b;
+        a = b;
+        b = r;
+    }
+    
+    return a;
+}
+
+// ------------------------------------------------------------------
 
 INT_TYPE mcd_ext(INT_TYPE &a, INT_TYPE &b) {
     INT_TYPE x[3], y[3], q, r;
@@ -108,12 +125,59 @@ INT_TYPE potencia_mod(INT_TYPE a, INT_TYPE m, INT_TYPE n) {
 // ------------------------------------------------------------------
 
 bool es_primo(INT_TYPE p) {
+    INT_TYPE s, n = 2, a, aux; 
     
-    if(p < 5 and (p == 3 or p == 2)) return true;
-    if(p & 0x1) return false; // El número es potencia de 2
+    // Casos base
+    if(p == 3 or p == 2) return true;
     
+    // Primero buscar "s" tq p-1 = 2^n * s
+    while(aux == n or n > (p - 1)) {
+        aux = mcd(n, p);
+        n *= n;
+    }
     
+    std::cout << "#############  DEBUG  #############\n";
+    std::cout << "## n = " << n << std::endl;
     
+    // obtener s
+    s = (p - 1) / n;
+    // Comprobar si es mejor ver si s > p antes de hacer %
+    s = s % p;
+    
+    // Debug
+    
+    std::cout << "## 2^" << n << " s: " << s << std::endl;
+
+    // End debug
+    
+    // Generar de manera aleatoria a
+    long unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::minstd_rand0 generator(seed);
+    a = generator();        // Genera un nº entre 1 y 2147483646
+    a %= (p-2);
+    a = a < 1 ? 2 : a;
+    
+    a = potencia_mod(a, s, p);
+    
+    std::cout << "## marca 1\n";
+    
+    // Malo:
+    // A partir de números > de 8 cifras los tiempos se disparan
+    // Idea:
+    // Desenrrollar bucle e intentar optimizar de otras maneras
+    
+    if (a == 1 or a == (p - 1))
+        return true;
+    else {
+        for(INT_TYPE i = 1;i < (s - 1) and a != (p -1);++i) {
+            a = (a * a) % p;
+            if(a == 1) return false;
+        }
+        
+        if(a != (p - 1)) return false;
+    }
+    
+    return true;
 }
 
 
