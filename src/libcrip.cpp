@@ -2,6 +2,8 @@
 #include <random>
 #include <chrono>
 #include <iostream>
+#include <cstdlib>
+
 
 //#DEFINE DEBUG
 
@@ -178,6 +180,82 @@ bool es_primo(INT_TYPE p) {
     }
     
     return true;
+}
+
+// ------------------------------------------------------------------
+
+bool primer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
+    bin_size unos = 0,       // Indica el número de unos de la secuencia
+            ceros = 0;      // Indica el número de ceros de la secuencia
+            
+    for(bin_size i = 0;i < longitud;++i)
+        if(sec[i] == 1) ++unos;
+        else ++ceros;
+
+    if(abs(ceros - unos) > 1)
+        return false;
+    
+    return true;
+}
+
+// ------------------------------------------------------------------
+
+// Función para rotar una secuencia binaria n bits
+// Revisar ---------------------
+
+void rotar_sec(std::bitset<BIT_SIZE> &sec, bin_size, longitud, bin_size desp) {
+    std::bitset<BIT_SIZE> sec_aux(sec);
+    
+    for(bin_size i = 0;i < longitud; ++i) {
+        sec_aux[(i+desp)%longitud] = sec[i]; 
+    }
+    
+    sec = sec_aux;
+}
+
+// ------------------------------------------------------------------
+
+bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
+    
+    // Primero conseguir que no acabe por el mísmo símbolo que empieza
+    // para facilitar las cosas
+    if(sec[0] != sec[longitud-1]) {
+        // Función lambda para ver de cuanto es la racha inicial para saber
+        // de cuanto debe ser el desplazamiento para conseguir lo dicho antes
+        // Se presupone que sec cumple el primer postulado de Golomb
+        bin_size aux = [&sec, &longitud] () {
+            bin_size aux = 1, i = 0;
+            for( ;sec[0] == sec[i];++i, ++aux);
+            
+            return aux;
+        };
+        
+        rotar_sec(sec, longitud, aux);
+    }
+    
+    bin_size i = 0;
+    auto calcula_rachas = [&sec] (int i) {
+            bin_size aux = i + 1;
+            for( ;sec[i] == sec[aux];++i, ++aux);
+            
+            return aux;
+    };
+    
+    while(i < longitud) {
+        bin_size aux = calcula_rachas(i);
+        //usar un map e ir almacenando las rachas por clave la longtud y valor el número de rachas de esa longitud
+    }
+}
+
+// ------------------------------------------------------------------
+
+bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec) {
+    bool cumple = false;
+    
+    cumple = primer_postulado_Golomb(sec);
+    if(!cumple) return cumple;
+    
+    cumple = 
 }
 
 

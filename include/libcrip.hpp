@@ -15,10 +15,14 @@
 #define __LIBCRIP_HPP__
 
 #include <boost/multiprecision/cpp_int.hpp>
+#include <bitset>
+
+#define BIT_SIZE 32
 
 using namespace boost::multiprecision;
 
 typedef int128_t INT_TYPE; //< Plantilla para los enteros
+typedef uint8_t bin_size;  //< Tipo de datos para los tamaños de las cadenas binarias
 
 
 /**
@@ -76,6 +80,47 @@ INT_TYPE potencia_mod(INT_TYPE a, INT_TYPE m, INT_TYPE n);
  * \pre p >= 1
  */
 bool es_primo(INT_TYPE p);
+
+/**
+ * \brief Función que determina si una secuencia binaria cumple el primer postulado de Golomb.
+ * \param[in] sec una secuencia de bits del tipo bitset de la STL
+ * \param[in] longitud número de posiciones válidas en sec
+ * \retval false si no cumple el primer postulado
+ * \retval true si cumple el primer postulado
+ * \pre longitud debe ser <= que BIT_SIZE
+ */
+
+bool primer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
+
+/**
+ * \brief Función que determina si una secuencia binaria cumple el segundo postulado de Golomb
+ * \param[in] sec una secuencia de bits del tipo bitset de la STL
+ * \param[in] longitud número de posiciones válidas en sec
+ * \retval false si no cumple el primer postulado
+ * \retval true si cumple el primer postulado
+ * \pre longitud debe ser <= que BIT_SIZE
+ */
+ 
+bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec);
+
+/**
+ * \brief
+ * \param[in] 
+ * \retval false
+ * \retval true
+ * \pre
+ */
+ 
+bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec);
+
+/**
+ * \brief Función que determina si una secuencia de bits cumple los postulados de Golomb.
+ * \param[in] 
+ * \retval false
+ * \retval true
+ * \pre
+ */
+bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec);
 
 #endif
 
