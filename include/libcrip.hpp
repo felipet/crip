@@ -77,6 +77,17 @@ INT_TYPE potencia_mod(INT_TYPE a, INT_TYPE m, INT_TYPE n);
  */
 bool es_primo(INT_TYPE p);
 
+/**
+ * \brief Logaritmo discreto
+ * Calcula el valor de b en la expresión a^b = c mod p
+ * \param[in] a base
+ * \param[in] c valor resultado
+ * \param[in] p primo para el módulo
+ * \return el valor del logaritmo que resuelve la expresión anterior
+ * \pre p es primo
+ */
+INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p);
+
 #endif
 
 // Final de fichero: libcrip.hpp

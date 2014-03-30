@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 
+
 //#DEFINE DEBUG
 
 INT_TYPE mcd(INT_TYPE a, INT_TYPE b) {
@@ -178,6 +179,14 @@ bool es_primo(INT_TYPE p) {
     }
     
     return true;
+}
+
+// ------------------------------------------------------------------
+
+INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p) {
+    INT_TYPE s, t, r;
+    
+    s
 }
 
 
