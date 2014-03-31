@@ -104,11 +104,12 @@ bool primer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
 bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec);
 
 /**
- * \brief
- * \param[in] 
- * \retval false
- * \retval true
- * \pre
+ * \brief Función que determina si una secuencia binaria cumple el tercer postulado de Golomb
+ * \param[in] sec una secuencia de bits del tipo bitset de la STL
+ * \param[in] longitud número de posiciones válidas en sec
+ * \retval false si no cumple el primer postulado
+ * \retval true si cumple el primer postulado
+ * \pre longitud debe ser <= que BIT_SIZE
  */
  
 bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec);

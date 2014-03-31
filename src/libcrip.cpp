@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <cstdlib>
+#include <map>
 
 
 //#DEFINE DEBUG
@@ -233,29 +234,79 @@ bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
         rotar_sec(sec, longitud, aux);
     }
     
-    bin_size i = 0;
-    auto calcula_rachas = [&sec] (int i) {
+    // Declaración de una función anónima para calcuar la longitud de una racha
+    // desde la posición i
+    auto calcula_rachas = [&sec] (int &i) {
             bin_size aux = i + 1;
             for( ;sec[i] == sec[aux];++i, ++aux);
             
             return aux;
     };
     
+    bin_size i = 0;
+    std::map<int, int> rachas;
+    
+    // Inicializar el map con las longitudes de rachas posibles
+    for(bin_size j = 0;j < (longitud>>1);++j)
+        rachas.insert( std::pair<int, int>(i, 0) );
+    
     while(i < longitud) {
-        bin_size aux = calcula_rachas(i);
-        //usar un map e ir almacenando las rachas por clave la longtud y valor el número de rachas de esa longitud
+        rachas[calcula_rachas(i)]++;
+    }
+    
+    // Comprobar que las rachas cumplen el 2º postulado de Golomb
+    for(bin_size j = 0;j < (longitud>>1);++j)
+        if(rachas[j] != (rachas[j+1]<<1) or rachas[j] != rachas[j+1])
+            return false;
+    
+    return true;
+}
+
+// ------------------------------------------------------------------
+
+bin_size distancia_Hamming(std::bitset<BIT_SIZE> sec1, 
+                           std::bitset<BIT_SIZE> sec2, bin_size longitud) {
+    /*
+       En vez de ir comprobando posición por posición si sec1[i] == sec2[i]
+       utilizo una secuencia auxiliar construida a partir de la XOR de las
+       otras dos, de manera que solo tengo que ir sumando los unos de aux
+       para saber la distancia de Hamming.
+    */
+    bin_size dist = 0;
+    std::bitset<BIT_SIZE> aux(sec1^sec2);
+    
+    for(bin_size i = 0;i < longitud;++i) {
+        dist += aux[i];
+    }
+    
+    return dist;
+}
+
+// ------------------------------------------------------------------
+
+bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
+    std::
+    bin_size dist = distancia_Hamming(sec, );
+    
+    for(bin_size i = 0;i < longitud;++i) {
+        
     }
 }
 
 // ------------------------------------------------------------------
 
-bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec) {
+bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
     bool cumple = false;
     
-    cumple = primer_postulado_Golomb(sec);
+    cumple = primer_postulado_Golomb(sec, longitud);
     if(!cumple) return cumple;
     
-    cumple = 
+    cumple = segundo_postulado_Golomb(sec, longitud);
+    if(!cumple) return cumple;
+    
+    cumple = tercer_postulado_Golomb(sec, longitud);
+    
+    return cumple;
 }
 
 
