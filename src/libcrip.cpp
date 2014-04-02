@@ -2,6 +2,7 @@
 #include <random>
 #include <chrono>
 #include <iostream>
+#include <vector>
 
 
 //#DEFINE DEBUG
@@ -184,9 +185,76 @@ bool es_primo(INT_TYPE p) {
 // ------------------------------------------------------------------
 
 INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p) {
-    INT_TYPE s, t, r;
+    INT_TYPE t, r, aux;
+    big_unsigned s; // Se asegura que s será de almenos 64 bits
     
-    s
+    // Este casting es una lotería (probado con números pequeños)
+    s = (big_unsigned) sqrt(p) + 1; // Sumar uno por el redondeo al hacer la raíz entera
+
+//  BUG: el tamaño de la reserva no puede ser pasado desde un tipo no integral
+//       por lo que s no puede ser de los tipos usados en Boost.
+    INT_TYPE *vt, *vr;
+    vt = new INT_TYPE[s];
+    vr = new INT_TYPE[s];
+    
+    std::cout << "## Debug : \n";
+    std::cout << "\t a : " << a << std::endl;
+    std::cout << "\t p : " << p << std::endl;
+    std::cout << "\t c : " << c << std::endl;
+    std::cout << "\t s : " << s << std::endl;
+    
+    // Poner aquí por qué es hasta s
+    vr[0] = c;
+    //vt[0] = aux = (a^s) % p;
+    vt[0] = aux = potencia_mod(a, s, p);
+        
+    // ### Paralelizar o no
+    // Vector paso enano
+    for(big_unsigned i = 1;i < s;++i) {
+        vr[i] = (vr[i-1] * a) % p;
+    }
+    
+    // Vector paso gigante
+    INT_TYPE x = potencia_mod(a, s, p);
+    for(long long unsigned i = 1;i < s;++i) {
+        vt[i] = (vt[i-1] * aux) % p;
+    }
+    
+    // Función anómima que indica si un elemento del vector vr se encuentra
+    // en vt y en caso afirmativo devuelve la posición donde lo encontró.
+    auto encontrado = [&] (INT_TYPE elem) {
+        for(big_unsigned i = 0;i < s;++i)
+            if(vt[i] == elem) 
+                return i+1; // más uno porque los índices en vt empiezan en 1
+            
+        return (big_unsigned) 0;
+    };
+    
+    t = 0;
+    big_unsigned temp;
+    for(big_unsigned i = 0;i < s;++i) {
+        temp = encontrado(vr[i]);
+        if(temp) {
+            std::cout << "## Debug : \n";
+            std::cout << "\t temp : " << temp << std::endl;
+            std::cout << "\t s : " << s << std::endl;
+            std::cout << "\t i : " << i << std::endl;
+            
+            t = s * temp - i;
+            std::cout << "\t t : " << t << std::endl;
+            break;
+        }
+    }
+    
+    std::cout << "## Debug : \n";
+    for(big_unsigned i = 0;i < s;++i) {  
+        std::cout << "\tvt : " << vt[i] << " ,vr : " << vr[i] << std::endl;
+    }
+    
+    delete[] vr;
+    delete[] vt;
+    
+    return t;
 }
 
 

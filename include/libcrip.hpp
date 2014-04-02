@@ -18,7 +18,8 @@
 
 using namespace boost::multiprecision;
 
-typedef int128_t INT_TYPE; //< Plantilla para los enteros
+typedef uint128_t INT_TYPE; //< Plantilla para los enteros
+typedef long long unsigned big_unsigned;
 
 
 /**
