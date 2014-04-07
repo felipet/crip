@@ -257,5 +257,41 @@ INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p) {
     return t;
 }
 
+// ------------------------------------------------------------------
+
+bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y) {
+    INT_TYPE temp = sqrt(n) + 1; // sqrt coge el entero inferior
+    INT_TYPE top = temp;
+    unsigned i = 0;
+    
+    // Función lambda para determinar si k es cuadrado perfecto
+    // Revisar esta función
+    auto cuadrado_perfecto = [] (INT_TYPE j, INT_TYPE k) { 
+//        INT_TYPE t = k*k;
+//        bool a = (k == sqrt(t));
+        return (bool)(j*j == sqrt(k));
+    }; 
+    
+    std::cout << "## Debug : \n";
+    std::cout << "##\t temp = " << temp;
+    
+    top = temp * temp - n;
+    std::cout << "\t top = " << top << std::endl;
+    while(!cuadrado_perfecto(temp, top) and top < n and i < 10) {
+        ++temp;
+        top = temp * temp - n;
+        std::cout << "##\t temp = " << temp;
+        std::cout << "\t top = " << top << std::endl;
+        ++i;
+    }
+    
+    if(temp < n) {
+        x = temp;
+        y = sqrt( temp * temp - n );
+        return true;
+    }
+    
+    return false;
+}
 
 // Final fichero: libcrip.cpp

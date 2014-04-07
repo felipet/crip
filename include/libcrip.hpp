@@ -89,6 +89,17 @@ bool es_primo(INT_TYPE p);
  */
 INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p);
 
+/**
+ * \brief Método de Fermat para factorizar enteros
+ * \param[in] n el número entero a factorizar
+ * \param[out] x devolverá el valor calculado para uno de los factores
+ * \param[out] y devolverá el valor calculado para el otro de los factores
+ * \retval true si el número no es primo
+ * \retval false si el número es primo y no se puede factorizar
+ * \post x e y solo tendrán valores válido si la función devuelve true
+ */
+bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y);
+
 #endif
 
 // Final de fichero: libcrip.hpp
