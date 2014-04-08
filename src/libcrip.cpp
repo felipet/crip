@@ -5,16 +5,36 @@
 #include <vector>
 
 
-//#DEFINE DEBUG
+#define DEBUG
+//#define DEBUG2
 
 INT_TYPE mcd(INT_TYPE a, INT_TYPE b) {
     INT_TYPE r;
+    
+    #ifdef DEBUG
+    std::cout << "## Debug mcd \n";
+    #endif
+    
+    if(a < b) {
+        a ^= b;
+        b ^= a;
+        a ^= b;
+    }
+    
+    #ifdef DEBUG
+    std::cout << "\tentradas: " << a << " , " << b << std::endl;
+    #endif
     
     while(!b) {
         r = a % b;
         a = b;
         b = r;
     }
+    
+    #ifdef DEBUG
+    std::cout << "\tresultado : " << a << std::endl;
+    std::cout << "## Fin Debug mcd \n";
+    #endif
     
     return a;
 }
@@ -42,6 +62,10 @@ INT_TYPE mcd_ext(INT_TYPE &a, INT_TYPE &b) {
         cambiados = true;
      }
      
+    #ifdef DEBUG
+    std::cout << "## Debug mcd_ext \n";
+    #endif
+     
      x[2] = y[1] = 1;
      x[1] = y[2] = 0;
      
@@ -57,7 +81,7 @@ INT_TYPE mcd_ext(INT_TYPE &a, INT_TYPE &b) {
         y[2] = y[1];
         y[1] = y[0];
         
-        #ifdef DEBUG
+        #ifdef DEBUG2
         using namespace std;
             cout << "Iteración : " << i << endl;
             cout << "q" << "\t" << "r" << "\t" << "x" << "\t" << "y" << "\t";
@@ -81,6 +105,11 @@ INT_TYPE mcd_ext(INT_TYPE &a, INT_TYPE &b) {
         b = x[2];
         a = y[2];
      }
+     
+    #ifdef DEBUG
+    std::cout << "\tresultado : " << r << std::endl;
+    std::cout << "## Fin Debug mcd_ext \n";
+    #endif
      
      return r;
 }
@@ -264,20 +293,23 @@ bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y) {
     INT_TYPE top = temp;
     unsigned i = 0;
     
+    auto f = [&n] (INT_TYPE x) { return x * x - n;};
+    
     // Función lambda para determinar si k es cuadrado perfecto
     // Revisar esta función
-    auto cuadrado_perfecto = [] (INT_TYPE j, INT_TYPE k) { 
-//        INT_TYPE t = k*k;
-//        bool a = (k == sqrt(t));
-        return (bool)(j*j == sqrt(k));
+    auto cuadrado_perfecto = [] (INT_TYPE k) { 
+        INT_TYPE square_root = sqrt(k),
+                 cuad = square_root * square_root;
+        std::cout << "##\t cuadrado = " << cuad << " , " << square_root << std::endl;
+        return (cuad == k);
     }; 
     
     std::cout << "## Debug : \n";
     std::cout << "##\t temp = " << temp;
     
-    top = temp * temp - n;
+    top = f(temp);
     std::cout << "\t top = " << top << std::endl;
-    while(!cuadrado_perfecto(temp, top) and top < n and i < 10) {
+    while(!cuadrado_perfecto(top) and top < n and i < 10) {
         ++temp;
         top = temp * temp - n;
         std::cout << "##\t temp = " << temp;
@@ -292,6 +324,79 @@ bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y) {
     }
     
     return false;
+}
+
+// ------------------------------------------------------------------
+
+INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter) {
+    INT_TYPE a = 5975, x, y, d, r, p;
+    unsigned i = 0;
+    
+    // Función pseudoaleatoria
+    auto f = [&n](INT_TYPE x) { return (x * x + 1) % n; };
+    
+    std::cout << "## Debug : \n";
+    x = f(a);
+    y = f(x);
+    std::cout << "\tparámetros iniciales : a = " << a << std::endl;
+    std::cout << "\t , x = " << x << " , y = " << y << std::endl;
+    
+    while(i < iter) {
+        // BUG: el modulo no lo hace bien con números negativos
+        r = y - x;
+        std::cout << "\t\t\tr = " << r << std::endl;
+        if(r < 0) r = n + r;
+        else r %= n;
+        p = n;
+        std::cout << "\tvalor it = " << i << std::endl;
+        std::cout << "\tentrada mcd : " << r << " , " << p << std::endl;
+        d = mcd_ext(r, p);
+        std::cout << "\tsalida mcd : " << d << std::endl;
+        
+        if(d == n) {
+            std::cout << "\t\tn es probablemente primo\n";
+            return 1;
+        }
+        if(d == 1) {
+            //++i;
+            x = f(x);
+            y = f( f(y) );
+            std::cout << "\tparámetros actualizados : x = " << x << " , y = " << y << std::endl;
+        }
+        else if(n % d == 0) {
+            std::cout << "\t\tFactor encontrado = " << d << std::endl;
+            return d;
+        }
+        
+        ++i;
+    }
+    
+    
+    std::cout << "\t\tSe alcanzó el límite máximo = " << iter << std::endl;
+    return 0;
+    
+    
+    
+//    std::cout << "## Debug : \n";
+//    
+//    for(unsigned i = 0;i < iter;i++) {
+//        a = (a * a + 1) % n;
+//        b = (a * a + 1) % n; //(b * b + 1) % n;
+//        INT_TYPE x = a, y = b, p = n,r = x -y;
+//        r = a - b;
+//        d = mcd(r, n);
+////        d = mcd_ext(r, p);
+//        std::cout << "\t valores it = " << i << std::endl;
+//        std::cout << "\t\ta = " << a << " b = " << b << " d = " << d << std::endl;
+//        if(d > 1 and d < n) return d;
+//        //if(d == 1) return 1;
+//        if(d == n) {
+//            std::cout << "## iteraciones : " << i << std::endl;
+//            return 0;
+//        }
+//    }
+    
+//    return 0;
 }
 
 // Final fichero: libcrip.cpp

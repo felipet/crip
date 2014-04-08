@@ -18,7 +18,7 @@
 
 using namespace boost::multiprecision;
 
-typedef uint128_t INT_TYPE; //< Plantilla para los enteros
+typedef int128_t INT_TYPE; //< Plantilla para los enteros
 typedef long long unsigned big_unsigned;
 
 
@@ -99,6 +99,17 @@ INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p);
  * \post x e y solo tendrán valores válido si la función devuelve true
  */
 bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y);
+
+/**
+ * \brief Método de factorización de enteros rho-Pollard
+ * \param[in] n el número entero a factorizar
+ * \param[in] i máximas iteraciones del bucle (condición de parada)
+ * \return un factor de n
+ * \retval 1 si n es probablemente primo
+ * \retval 0 si se salió del bucle antes de encontrar un factor
+ * \pre
+ */
+INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter = 1000);
 
 #endif
 

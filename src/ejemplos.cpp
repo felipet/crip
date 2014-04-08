@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
         ("primo,p", po::value<string>(), "Test de primalidad Miller-Rabin")
         ("log,l", po::value<vector<string> >()->multitoken(), "Calcula el logaritmo discreto para a^b = c mod p")
         ("fermat,f", po::value<string>(), "Método de factorización de Fermat")
+        ("pollard,r", po::value<string>(), "Método de factorización rho-Pollard")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -207,6 +208,37 @@ int main(int argc, char **argv) {
         }
     }
     
+    if(!vm["pollard"].empty()) {
+        INT_TYPE f, f2;
+        string opc = vm["pollard"].as<string>();
+        
+        if(opc.size() > 0) {
+            INT_TYPE value(opc.c_str());
+            
+            if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+            f = metodo_rho_pollard(value);
+            auto t2 = ch::high_resolution_clock::now();
+            
+            cout << "\tFactorización rho-Pollard: \n\t";
+            if(f > 1) {
+                f2 = value / f;
+                cout << value << " = (" << f << " * " << f2 << ")\n";
+            }
+            else{
+                if(f == 1) cout << value << " probablemente primo\n";
+                else cout << "No se ha podido factorizar\n";
+            }
+            
+            if(tiempos)
+                cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+                (t2 - t1).count() << "us" << endl;
+            
+            return 0;
+        }
+    }
+    
+    cout << desc << endl;
     
     return 0;
 }
