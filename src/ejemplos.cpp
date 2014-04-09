@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
     po::options_description desc("Opciones permitidas");
     desc.add_options()
         ("help,h", "Ayuda del programa")
+        ("mcd_ext,M", po::value<vector<string> >()->multitoken(), "Calcula el máximo común divisor de varios números (algoritmo extendido)")
         ("mcd,m", po::value<vector<string> >()->multitoken(), "Calcula el máximo común divisor de varios números")
         ("inverso,i", po::value<vector<string> >()->multitoken(),"Calcula el inverso de un número modulo n")
         ("pot,x",po::value<vector<string> >()->multitoken(), "Calcula el valor de a^m mod n")
@@ -42,6 +43,51 @@ int main(int argc, char **argv) {
     
     tiempos = vm.count("tiempos") ? true : false;
     
+    // Comprobación de las opciones
+    
+    // Opción para el mcd con el algoritmo extendido de Euclides
+    if(!vm["mcd_ext"].empty()) {
+        opc = vm["mcd_ext"].as<vector<string> >();
+        size = opc.size();
+        
+        if(size > 1) {
+            INT_TYPE mcd, a , b;
+            
+            values = new INT_TYPE*[size];
+            
+            for(auto x : opc) {
+                values[i] = new INT_TYPE(x.c_str());
+                ++i;
+            }
+            
+            a = *values[0];
+            b = *values[1];
+            
+            if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+            mcd = mcd_ext(*values[0], *values[1]);
+            auto t2 = ch::high_resolution_clock::now();
+            
+            cout << "\tmcd_ext: " << mcd << " = ";
+            cout << "\t(" << a << " * " << *values[0];
+            cout << ") +\n\t\t\t(" << b << " * " << *values[1] << ")" << endl; 
+            if(tiempos)
+                cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+                (t2 - t1).count() << "us" << endl;
+            
+            for(i = 0;i < size;i++)
+                delete[] values[i];
+            delete[] values;
+            
+            return 0;
+        }
+        else {
+            cout << "\tNúmero de parámetros incorrectos" << endl;
+            return 1;
+        }
+    }
+    
+    // Opción para mcd con el algoritmo de Euclides
     if(!vm["mcd"].empty()) {
         opc = vm["mcd"].as<vector<string> >();
         size = opc.size();
@@ -56,12 +102,9 @@ int main(int argc, char **argv) {
                 ++i;
             }
             
-            mcd = *values[0];
             if(tiempos)
                 t1 = ch::high_resolution_clock::now(); 
-            for(i = 1;i < size; i++)
-                mcd = mcd_ext(mcd, *values[i]);
-                // No se guardan u y v, cambiar si hace falta más tarde
+            mcd = MCD(*values[0], *values[1]);
             auto t2 = ch::high_resolution_clock::now();
             
             cout << "\tmcd:\t" << mcd << endl;
@@ -142,6 +185,47 @@ int main(int argc, char **argv) {
             return 0;
         }
     }
+    
+    // Opción para el inverso
+    
+    if(!vm["inverso"].empty()) {
+        bool p;
+        INT_TYPE res;
+        opc = vm["inverso"].as<vector<string> >();
+        size = opc.size();
+    
+        if(size > 1) {
+            size = opc.size();
+            INT_TYPE log;
+            
+            values = new INT_TYPE*[size];
+            
+            for(auto x : opc) {
+               values[i] = new INT_TYPE(x.c_str());
+                ++i;
+            }
+            
+            if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+            p = inverso(*values[0], *values[1], res);
+            auto t2 = ch::high_resolution_clock::now();
+            
+            if(p) {
+                cout << "\tInverso: \n\t";
+                cout << "\t" << res << " = " << *values[0] << "^(-1) mod " <<
+                *values[1] << endl;
+            }
+            else cout << "No se puede calcular el inverso\n";
+            
+            if(tiempos)
+                cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+                (t2 - t1).count() << "us" << endl;
+            
+            return 0;
+        }
+    }
+    
+    // Opción para el logaritmo discreto
     
     if(!vm["log"].empty()) {
         opc = vm["log"].as<vector<string> >();

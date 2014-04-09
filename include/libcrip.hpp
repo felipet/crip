@@ -31,7 +31,7 @@ typedef long long unsigned big_unsigned;
  * \return El MCD de a y b.
  *
  */
-INT_TYPE mcd(INT_TYPE a, INT_TYPE b);
+INT_TYPE MCD(INT_TYPE a, INT_TYPE b);
 
 /**
  * \brief Máximo común divisor de dos enteros
@@ -109,7 +109,7 @@ bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y);
  * \retval 0 si se salió del bucle antes de encontrar un factor
  * \pre
  */
-INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter = 1000);
+INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter = 10000000);
 
 #endif
 
