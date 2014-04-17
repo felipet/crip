@@ -1,17 +1,19 @@
 #include "libcrip.hpp"
 #include <random>
 #include <chrono>
-#include <iostream>
-#include <cstdlib>
-#include <map>
 
+//#define DEBUG
 
-//#DEFINE DEBUG
-
-INT_TYPE mcd(INT_TYPE a, INT_TYPE b) {
+INT_TYPE MCD(INT_TYPE a, INT_TYPE b) {
     INT_TYPE r;
     
-    while(!b) {
+    if(a < b) {
+        a ^= b;
+        b ^= a;
+        a ^= b;
+    }
+    
+    while(b > 0) {
         r = a % b;
         a = b;
         b = r;
@@ -135,23 +137,14 @@ bool es_primo(INT_TYPE p) {
     
     // Primero buscar "s" tq p-1 = 2^n * s
     while(aux == n or n > (p - 1)) {
-        aux = mcd(n, p);
+        aux = MCD(n, p);
         n *= n;
     }
-    
-    std::cout << "#############  DEBUG  #############\n";
-    std::cout << "## n = " << n << std::endl;
     
     // obtener s
     s = (p - 1) / n;
     // Comprobar si es mejor ver si s > p antes de hacer %
     s = s % p;
-    
-    // Debug
-    
-    std::cout << "## 2^" << n << " s: " << s << std::endl;
-
-    // End debug
     
     // Generar de manera aleatoria a
     long unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -162,25 +155,148 @@ bool es_primo(INT_TYPE p) {
     
     a = potencia_mod(a, s, p);
     
-    std::cout << "## marca 1\n";
-    
     // Malo:
     // A partir de números > de 8 cifras los tiempos se disparan
-    // Idea:
-    // Desenrrollar bucle e intentar optimizar de otras maneras
     
     if (a == 1 or a == (p - 1))
         return true;
     else {
-        for(INT_TYPE i = 1;i < (s - 1) and a != (p -1);++i) {
+        for(INT_TYPE i = 1;i < (s - 1);++i) {
             a = (a * a) % p;
             if(a == 1) return false;
+            if(a == (p-1)) return true;
         }
-        
-        if(a != (p - 1)) return false;
     }
     
-    return true;
+    return false;
+}
+
+// ------------------------------------------------------------------
+
+INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p) {
+    INT_TYPE t, r, aux;
+    big_unsigned s; // Se asegura que s será de almenos 64 bits
+    
+    // Este casting es una lotería (probado con números pequeños)
+    s = (big_unsigned) sqrt(p) + 1; // Sumar uno por el redondeo al hacer la raíz entera
+
+//  BUG: el tamaño de la reserva no puede ser pasado desde un tipo no integral
+//       por lo que s no puede ser de los tipos usados en Boost.
+    INT_TYPE *vt, *vr;
+    vt = new INT_TYPE[s];
+    vr = new INT_TYPE[s];
+    
+    // Poner aquí por qué es hasta s
+    vr[0] = c;
+    //vt[0] = aux = (a^s) % p;
+    vt[0] = aux = potencia_mod(a, s, p);
+        
+    // Vector paso enano
+    for(big_unsigned i = 1;i < s;++i) {
+        vr[i] = (vr[i-1] * a) % p;
+    }
+    
+    // Vector paso gigante
+    INT_TYPE x = potencia_mod(a, s, p);
+    for(long long unsigned i = 1;i < s;++i) {
+        vt[i] = (vt[i-1] * aux) % p;
+    }
+    
+    // Función anómima que indica si un elemento del vector vr se encuentra
+    // en vt y en caso afirmativo devuelve la posición donde lo encontró.
+    auto encontrado = [&] (INT_TYPE elem) {
+        for(big_unsigned i = 0;i < s;++i)
+            if(vt[i] == elem) 
+                return i+1; // más uno porque los índices en vt empiezan en 1
+            
+        return (big_unsigned) 0;
+    };
+    
+    t = 0;
+    big_unsigned temp;
+    for(big_unsigned i = 0;i < s;++i) {
+        temp = encontrado(vr[i]);
+        if(temp) {            
+            t = s * temp - i;
+            break;
+        }
+    }
+    
+    delete[] vr;
+    delete[] vt;
+    
+    return t;
+}
+
+// ------------------------------------------------------------------
+
+bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y) {
+    INT_TYPE j = sqrt(n) + 1,           // sqrt coge el entero inferior
+             aux;
+    
+    // f(x) = x^2 -n
+    auto f = [&n] (INT_TYPE x) { return x * x - n;};
+    
+    // Función lambda para determinar si k es cuadrado perfecto
+    // Revisar esta función
+    auto cuadrado_perfecto = [] (INT_TYPE k) { 
+        INT_TYPE square_root = sqrt(k);
+        return (square_root * square_root == k);
+    };
+    
+    aux = f(j);
+    while(!cuadrado_perfecto(aux) and j < n) {
+        ++j;
+        aux = f(j);
+    }
+    
+    if(j < n-1) {
+        x = j;
+        y = sqrt( f(j) );
+        return true;
+    }
+    
+    return false;
+}
+
+// ------------------------------------------------------------------
+
+INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter) {
+    INT_TYPE a = 5975, x, y, d, r, p;
+    unsigned i = 0;
+    
+    // Función pseudoaleatoria
+    auto f = [&n](INT_TYPE x) { return (x * x + 1) % n; };
+    
+    x = f(a);
+    y = f(x);
+    
+    while(i < iter) {
+        r = y - x;
+        
+        // El operador % no trabaja bien con números < 0
+        if(r < 0) r = n + r;
+        else r %= n;
+        
+        p = n;
+        d = mcd_ext(r, p);
+        
+        if(d == n) {
+            return 1;
+        }
+        if(d == 1) {
+            //++i;
+            x = f(x);
+            y = f( f(y) );
+        }
+        else if(n % d == 0) {
+            return d;
+        }
+        
+        ++i;
+    }
+    
+    return 0;
 }
 
 // ------------------------------------------------------------------

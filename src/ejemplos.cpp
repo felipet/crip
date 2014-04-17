@@ -25,6 +25,8 @@ int main(int argc, char **argv) {
         ("inverso,i", po::value<vector<string> >()->multitoken(),"Calcula el inverso de un número modulo n")
         ("pot,x",po::value<vector<string> >()->multitoken(), "Calcula el valor de a^m mod n")
         ("primo,p", po::value<string>(), "Test de primalidad Miller-Rabin")
+        ("log,l", po::value<vector<string> >()->multitoken(), "Calcula el logaritmo discreto para a^b = c mod p")
+        ("fermat,f", po::value<string>(), "Método de factorización de Fermat")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -94,8 +96,6 @@ int main(int argc, char **argv) {
                 ++i;
             }
             
-            cout << "ekekke" << endl;
-            
             if(tiempos)
                 t1 = ch::high_resolution_clock::now(); 
             pot = potencia_mod(*values[0], *values[1], *values[2]);
@@ -137,6 +137,71 @@ int main(int argc, char **argv) {
             if(tiempos)
                 cout << "\tTiempo:\t" << chrono::duration_cast<chrono::milliseconds >
                 (t2 - t1).count() << "ms" << endl;
+            
+            return 0;
+        }
+    }
+    
+    if(!vm["log"].empty()) {
+        opc = vm["log"].as<vector<string> >();
+        size = opc.size();
+    
+        if(size > 1) {
+            size = opc.size();
+            INT_TYPE log;
+            
+            values = new INT_TYPE*[size];
+            
+            for(auto x : opc) {
+               values[i] = new INT_TYPE(x.c_str());
+                ++i;
+            }
+
+            if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+            log = log_discreto(*values[0], *values[1], *values[2]);
+            auto t2 = ch::high_resolution_clock::now();
+            
+            cout << "\tLogaritmo discreto:\t" << log << endl;
+            if(tiempos)
+                cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+                (t2 - t1).count() << "us" << endl;
+            
+            for(i = 0;i < size;i++)
+                delete[] values[i];
+            delete[] values;
+            
+            return 0; 
+        }
+        else {
+            cout << "\tNúmero de parámetros incorrectos" << endl;
+            return 1;
+        }
+    }
+    
+    if(!vm["fermat"].empty()) {
+        bool p = false;
+        INT_TYPE x,y;
+        string opc = vm["fermat"].as<string>();
+        
+        if(opc.size() > 0) {
+            INT_TYPE value(opc.c_str());
+            
+            if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+            p = metodo_fermat(value, x, y);
+            auto t2 = ch::high_resolution_clock::now();
+            
+            if(p) {
+                cout << "\tFactorización de Fermat: \n\t";
+                cout << value << " = (" << x << " + " << y << ") (";
+                cout << x << " - " << y << ")\n";
+            }
+            else cout << "No se ha podido factorizar\n";
+            
+            if(tiempos)
+                cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+                (t2 - t1).count() << "us" << endl;
             
             return 0;
         }

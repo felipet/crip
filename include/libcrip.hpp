@@ -23,6 +23,7 @@ using namespace boost::multiprecision;
 
 typedef int128_t INT_TYPE; //< Plantilla para los enteros
 typedef uint8_t bin_size;  //< Tipo de datos para los tamaños de las cadenas binarias
+typedef long long unsigned big_unsigned;
 
 
 /**
@@ -82,6 +83,39 @@ INT_TYPE potencia_mod(INT_TYPE a, INT_TYPE m, INT_TYPE n);
 bool es_primo(INT_TYPE p);
 
 /**
+ * \brief Logaritmo discreto
+ * Calcula el valor de b en la expresión a^b = c mod p
+ * \param[in] a base
+ * \param[in] c valor resultado
+ * \param[in] p primo para el módulo
+ * \return el valor del logaritmo que resuelve la expresión anterior
+ * \pre p es primo
+ */
+INT_TYPE log_discreto(INT_TYPE a, INT_TYPE c, INT_TYPE p);
+
+/**
+ * \brief Método de Fermat para factorizar enteros
+ * \param[in] n el número entero a factorizar
+ * \param[out] x devolverá el valor calculado para uno de los factores
+ * \param[out] y devolverá el valor calculado para el otro de los factores
+ * \retval true si el número no es primo
+ * \retval false si el número es primo y no se puede factorizar
+ * \post x e y solo tendrán valores válido si la función devuelve true
+ */
+bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y);
+
+/**
+ * \brief Método de factorización de enteros rho-Pollard
+ * \param[in] n el número entero a factorizar
+ * \param[in] i máximas iteraciones del bucle (condición de parada)
+ * \return un factor de n
+ * \retval 1 si n es probablemente primo
+ * \retval 0 si se salió del bucle antes de encontrar un factor
+ * \pre
+ */
+INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter = 10000000);
+
+/**
  * \brief Función que determina si una secuencia binaria cumple el primer postulado de Golomb.
  * \param[in] sec una secuencia de bits del tipo bitset de la STL
  * \param[in] longitud número de posiciones válidas en sec
@@ -122,6 +156,7 @@ bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec);
  * \pre
  */
 bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec);
+
 
 #endif
 
