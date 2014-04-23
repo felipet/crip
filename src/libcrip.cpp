@@ -136,16 +136,12 @@ bool es_primo(INT_TYPE p) {
     if(p == 3 or p == 2) return true;
     
     // Primero buscar "s" tq p-1 = 2^n * s
-    while(aux == n or n > (p - 1)) {
-        aux = MCD(n, p);
-        n *= n;
-    }
+    s = p - 1;
+    do {
+        n >= 2;    
+    } while(!(n & 0x1));
     
-    // obtener s
-    s = (p - 1) / n;
-    // Comprobar si es mejor ver si s > p antes de hacer %
-    s = s % p;
-    
+    s = (p-1) / (p/n);
     // Generar de manera aleatoria a
     long unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::minstd_rand0 generator(seed);

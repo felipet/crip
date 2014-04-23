@@ -109,7 +109,7 @@ bool metodo_fermat(INT_TYPE n, INT_TYPE &x, INT_TYPE &y);
  * \retval 0 si se salió del bucle antes de encontrar un factor
  * \pre
  */
-INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter = 10000000);
+INT_TYPE metodo_rho_pollard(INT_TYPE n, unsigned iter = 500000);
 
 #endif
 
