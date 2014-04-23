@@ -135,7 +135,7 @@ bool primer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
  * \pre longitud debe ser <= que BIT_SIZE
  */
  
-bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec);
+bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
 
 /**
  * \brief Función que determina si una secuencia binaria cumple el tercer postulado de Golomb
@@ -146,7 +146,7 @@ bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec);
  * \pre longitud debe ser <= que BIT_SIZE
  */
  
-bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec);
+bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
 
 /**
  * \brief Función que determina si una secuencia de bits cumple los postulados de Golomb.

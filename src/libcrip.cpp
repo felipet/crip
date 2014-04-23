@@ -1,6 +1,8 @@
 #include "libcrip.hpp"
 #include <random>
 #include <chrono>
+#include <map>
+#include <stdio.h>
 
 //#define DEBUG
 
@@ -305,7 +307,7 @@ bool primer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
     bin_size unos = 0,       // Indica el número de unos de la secuencia
             ceros = 0;      // Indica el número de ceros de la secuencia
             
-    for(bin_size i = 0;i < longitud;++i)
+    for(bin_size i = 0;i < longitud; ++i)
         if(sec[i] == 1) ++unos;
         else ++ceros;
 
@@ -320,7 +322,7 @@ bool primer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
 // Función para rotar una secuencia binaria n bits
 // Revisar ---------------------
 
-void rotar_sec(std::bitset<BIT_SIZE> &sec, bin_size, longitud, bin_size desp) {
+void rotar_sec(std::bitset<BIT_SIZE> &sec, bin_size longitud, bin_size desp) {
     std::bitset<BIT_SIZE> sec_aux(sec);
     
     for(bin_size i = 0;i < longitud; ++i) {
@@ -333,43 +335,94 @@ void rotar_sec(std::bitset<BIT_SIZE> &sec, bin_size, longitud, bin_size desp) {
 // ------------------------------------------------------------------
 
 bool segundo_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
+
+    std::cout << "## Debug ##" << std::endl;
     
     // Primero conseguir que no acabe por el mísmo símbolo que empieza
     // para facilitar las cosas
-    if(sec[0] != sec[longitud-1]) {
+    std::cout << "Cadena ini:" << sec << std::endl;
+    printf("sec[0] = %d, sec[%d] = %d\n",(int)sec[0], longitud-1, (int)sec[longitud-1]);
+    printf("Longitud : %d\n", (int) longitud);
+
+    if(sec[0] == sec[longitud-1]) {
+    
+    // Debug
+    std::cout << "\tEmpieza igual que acaba : " << sec << std::endl;
+    std::cout << "\tLongitud : " << (unsigned) longitud << std::endl;
+    
         // Función lambda para ver de cuanto es la racha inicial para saber
         // de cuanto debe ser el desplazamiento para conseguir lo dicho antes
         // Se presupone que sec cumple el primer postulado de Golomb
-        bin_size aux = [&sec, &longitud] () {
-            bin_size aux = 1, i = 0;
+        auto aux = [&sec, &longitud] () {
+            bin_size aux = 1, i = 1;
             for( ;sec[0] == sec[i];++i, ++aux);
             
-            return aux;
+            return (bin_size) aux;
         };
         
-        rotar_sec(sec, longitud, aux);
+        //debug
+        bin_size temp = aux();
+        printf("Desplazamiento inicial : %d\n", (int) temp);
+        
+//        rotar_sec(sec, longitud, aux());
+        rotar_sec(sec, longitud, temp);
+        
+        std::cout << "\tLa nueva cadena es " << sec << std::endl;
     }
     
     // Declaración de una función anónima para calcuar la longitud de una racha
     // desde la posición i
-    auto calcula_rachas = [&sec] (int &i) {
-            bin_size aux = i + 1;
-            for( ;sec[i] == sec[aux];++i, ++aux);
-            
-            return aux;
+//    auto calcula_rachas = [&sec] (bin_size &i) {
+//            bin_size aux = i + 1;
+//            if(sec[i] != sec[i+1] and sec[i] == sec[i+2]) return (bin_size) 1;
+//
+//            for( ;sec[i] == sec[aux];++i, ++aux);
+//
+//            return aux;
+//    };
+
+    auto calcula_rachas = [&sec, &longitud] (bin_size &k) {
+    	bin_size i = 1, racha = 0;
+
+    	for(bin_size j = 0;j < longitud and racha < k; ++j) {
+			if(sec[j] == sec[i])
+				racha++;
+			else return racha;
+    	}
+
+    	return racha;
     };
-    
+
     bin_size i = 0;
     std::map<int, int> rachas;
     
     // Inicializar el map con las longitudes de rachas posibles
-    for(bin_size j = 0;j < (longitud>>1);++j)
-        rachas.insert( std::pair<int, int>(i, 0) );
-    
-    while(i < longitud) {
-        rachas[calcula_rachas(i)]++;
+    for(bin_size j = 1;j < (longitud>>1); ++j) {
+        rachas.insert( std::pair<int, int>(j, 0) );
+        std::cout << (int) j << " " << rachas.at(j) << std::endl;
     }
     
+    printf("He pasado de aquí\n");
+    std::cout << rachas.size() << std::endl;
+    
+    i = 1;
+    bool pass = false;
+    while(i <= longitud) {
+        rachas[calcula_rachas(i)]++;
+
+        if(pass) {
+        	++i;
+        	pass ^= 1;
+        }
+        else pass ^= 1;
+    }
+    
+    printf("Y de aquí\n");
+    std::cout << "rachas de 4:" << rachas[4] << std::endl;
+    std::cout << "rachas de 3:" << rachas[3] << std::endl;
+    std::cout << "rachas de 2:" << rachas[2] << std::endl;
+    std::cout << "rachas de 1:" << rachas[1] << std::endl;
+
     // Comprobar que las rachas cumplen el 2º postulado de Golomb
     for(bin_size j = 0;j < (longitud>>1);++j)
         if(rachas[j] != (rachas[j+1]<<1) or rachas[j] != rachas[j+1])
@@ -401,12 +454,14 @@ bin_size distancia_Hamming(std::bitset<BIT_SIZE> sec1,
 // ------------------------------------------------------------------
 
 bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
-    std::
-    bin_size dist = distancia_Hamming(sec, );
-    
-    for(bin_size i = 0;i < longitud;++i) {
-        
-    }
+//    std::
+//    bin_size dist = distancia_Hamming(sec, );
+//    
+//    for(bin_size i = 0;i < longitud;++i) {
+//        
+//    }
+
+	return false;
 }
 
 // ------------------------------------------------------------------
