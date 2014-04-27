@@ -155,7 +155,7 @@ bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
  * \retval true
  * \pre
  */
-bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec);
+bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
 
 
 #endif

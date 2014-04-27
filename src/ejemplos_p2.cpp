@@ -21,6 +21,8 @@ int main(int argc, char **argv) {
         ("help,h", "Ayuda del programa")
         ("p1,1", po::value<string>(), "Primer postulado de Golomb")
         ("p2,2", po::value<string>(), "Segundo postulado de Golomb")
+        ("p3,3", po::value<string>(), "Tercer postulado de Golomb")
+        ("golomb,g", po::value<string>(), "Comprobar postulados de Golomb")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -76,6 +78,56 @@ int main(int argc, char **argv) {
         
         cout << "\tLa cadena : " << cadena << endl;
         cout <<"\t¿Cumple el segundo postulado de Golomb? : ";
+        cout << (cumple? "Si" : "No") << endl;
+        
+        if(tiempos)
+            cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+            (t2 - t1).count() << "us" << endl;
+        
+        return 0;
+    }
+    
+    // Tercer postulado de Golomb
+    
+    if(!vm["p3"].empty()) {
+        string cadena(vm["p3"].as<string>());
+        bitset<BIT_SIZE> sec(cadena);
+        unsigned size = cadena.size();
+        
+        if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+                
+        bool cumple = tercer_postulado_Golomb(sec, size);
+        
+        auto t2 = ch::high_resolution_clock::now();
+        
+        cout << "\tLa cadena : " << cadena << endl;
+        cout <<"\t¿Cumple el tercer postulado de Golomb? : ";
+        cout << (cumple? "Si" : "No") << endl;
+        
+        if(tiempos)
+            cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+            (t2 - t1).count() << "us" << endl;
+        
+        return 0;
+    }
+    
+    // Comprobar postulados de Golomb
+    
+    if(!vm["golomb"].empty()) {
+        string cadena(vm["golomb"].as<string>());
+        bitset<BIT_SIZE> sec(cadena);
+        unsigned size = cadena.size();
+        
+        if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+                
+        bool cumple = cumple_postulados_Golomb(sec, size);
+        
+        auto t2 = ch::high_resolution_clock::now();
+        
+        cout << "\tLa cadena : " << cadena << endl;
+        cout <<"\t¿Cumple los postulados de Golomb? : ";
         cout << (cumple? "Si" : "No") << endl;
         
         if(tiempos)
