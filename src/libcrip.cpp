@@ -427,5 +427,46 @@ bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
     return cumple;
 }
 
+// ------------------------------------------------------------------
+
+int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
+            std::bitset<BIT_SIZE> seed, unsigned size_seed,
+            std::bitset<BIT_SIZE> &out, unsigned size_out) {
+            
+    if(size_out >= BIT_SIZE) return -1;
+    
+    // Quitar el 1 del polinomio de conexión
+    coefs >>= 1;
+    
+    /*
+       Construyo una secuencia auxiliar a partir de la XOR de los coeficientes
+       y la semilla (o parte de la cedna generada) y luego obtentengo el 
+       siguiente bit de la secuencia de salida
+    */
+    // Paso inicial
+    std::bitset<BIT_SIZE> aux = coefs ^ seed;
+    out = seed;
+    out <<= 1;
+    std::cout << out << std::endl;
+    out[0] = (aux.count() >> 1) & 0x1;
+    seed <<= 1;
+    seed[0] = out[0];
+    std::cout << out << std::endl;
+    
+    
+    // Revisar
+    for(unsigned i = 0;i < size_out;i++) {
+        aux = coefs ^ seed;
+        std::cout << "aux : " << aux << ", count: " << aux.count() << std::endl;
+        out[0] = (aux.count() >> 1) & 0x1;
+        out <<= 1;
+        std::cout << "out : " << out << std::endl;
+        seed <<= 1;
+        seed[0] = out[i];
+        std::cout << "seed : " << seed << std::endl;
+    }
+    
+    return 0;
+}
 
 // Final fichero: libcrip.cpp

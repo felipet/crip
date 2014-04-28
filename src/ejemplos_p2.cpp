@@ -3,6 +3,7 @@
 #include <iostream>         // Entrada salida
 #include <bitset>           // Vector de bits de la STD
 #include <string>
+#include <sstream>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -23,6 +24,7 @@ int main(int argc, char **argv) {
         ("p2,2", po::value<string>(), "Segundo postulado de Golomb")
         ("p3,3", po::value<string>(), "Tercer postulado de Golomb")
         ("golomb,g", po::value<string>(), "Comprobar postulados de Golomb")
+        ("lfsr,r", po::value<vector<string> >()->multitoken(), "LFSR")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -129,6 +131,40 @@ int main(int argc, char **argv) {
         cout << "\tLa cadena : " << cadena << endl;
         cout <<"\t¿Cumple los postulados de Golomb? : ";
         cout << (cumple? "Si" : "No") << endl;
+        
+        if(tiempos)
+            cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+            (t2 - t1).count() << "us" << endl;
+        
+        return 0;
+    }
+    
+    // Ejercicio2 : LFSR
+    
+    if(!vm["lfsr"].empty()) {
+        vector<string> opc = vm["lfsr"].as<vector<string> >();
+        
+        if(opc.size() < 3) {
+            cout << "\t Número de parámetros incorrectos\n";
+            return 0;
+        }
+    
+        bitset<BIT_SIZE> coefs(opc[0]);
+        unsigned size_coefs = opc[0].size();
+        bitset<BIT_SIZE> seed(opc[1]);
+        unsigned size_seed = opc[1].size();
+        bitset<BIT_SIZE> out;
+        unsigned size_out;
+        istringstream (opc[2]) >> size_out;
+        
+        if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+                
+        int error = LFSR(coefs, size_coefs, seed, size_seed, out, size_out);
+        
+        auto t2 = ch::high_resolution_clock::now();
+        
+        cout << "\tLa cadena : " << out << endl;
         
         if(tiempos)
             cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >

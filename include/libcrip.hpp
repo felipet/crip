@@ -157,6 +157,16 @@ bool tercer_postulado_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
  */
 bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
 
+/**
+ * \brief 
+ * \param[in] 
+ * \retval false
+ * \retval true
+ * \post La secuencia out está en orden inverso a las demás.
+ */
+int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
+            std::bitset<BIT_SIZE> seed, unsigned size_seed,
+            std::bitset<BIT_SIZE> &out, unsigned size_out     );
 
 #endif
 
