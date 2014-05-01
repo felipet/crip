@@ -429,41 +429,52 @@ bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud) {
 
 // ------------------------------------------------------------------
 
+void despl_izq(std::bitset<BIT_SIZE> &sec, bin_size longitud) {
+    for(bin_size i = longitud-1;i > 0;i--) 
+        sec[i] = sec[i-1];
+        
+    sec[0] = 0;
+}
+
+// ------------------------------------------------------------------
+
+bool 
+suma_z2(std::bitset<BIT_SIZE> op1,
+        std::bitset<BIT_SIZE> op2, bin_size longitud) {
+                              
+    std::bitset<BIT_SIZE> suma;
+    
+    for(bin_size i = 0;i < longitud;i++)
+        suma[i] = op1[i] and op2[i];
+        
+    bool a = suma.count() %2;
+    
+    std::cout << "la suma es " << a << std::endl;
+    
+    return a;
+}       
+
+// ------------------------------------------------------------------
+
 int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
-            std::bitset<BIT_SIZE> seed, unsigned size_seed,
-            std::bitset<BIT_SIZE> &out, unsigned size_out) {
+           std::bitset<BIT_SIZE> seed, unsigned size_seed,
+           std::bitset<BIT_SIZE> &out, unsigned size_out) {
             
     if(size_out >= BIT_SIZE) return -1;
     
-    // Quitar el 1 del polinomio de conexión
-    coefs >>= 1;
-    
-    /*
-       Construyo una secuencia auxiliar a partir de la XOR de los coeficientes
-       y la semilla (o parte de la cedna generada) y luego obtentengo el 
-       siguiente bit de la secuencia de salida
-    */
-    // Paso inicial
-    std::bitset<BIT_SIZE> aux = coefs ^ seed;
     out = seed;
     out <<= 1;
-    std::cout << out << std::endl;
-    out[0] = (aux.count() >> 1) & 0x1;
-    seed <<= 1;
-    seed[0] = out[0];
-    std::cout << out << std::endl;
+    std::cout << "out \t" << out << std::endl;
+    std::cout << "seed \t" << seed << std::endl;
     
-    
-    // Revisar
     for(unsigned i = 0;i < size_out;i++) {
-        aux = coefs ^ seed;
-        std::cout << "aux : " << aux << ", count: " << aux.count() << std::endl;
-        out[0] = (aux.count() >> 1) & 0x1;
-        out <<= 1;
-        std::cout << "out : " << out << std::endl;
-        seed <<= 1;
-        seed[0] = out[i];
-        std::cout << "seed : " << seed << std::endl;
+        out[0] = suma_z2(coefs, seed, size_coefs);
+        std::cout << "out \t" << out << std::endl;
+        despl_izq(seed, size_seed);
+        seed[0] = out[0];
+        if(i < size_out - 1)
+            out <<= 1;
+        std::cout << "seed \t" << seed << std::endl;
     }
     
     return 0;
