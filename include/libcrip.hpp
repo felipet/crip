@@ -167,6 +167,27 @@ bool cumple_postulados_Golomb(std::bitset<BIT_SIZE> sec, bin_size longitud);
 int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
             std::bitset<BIT_SIZE> seed, unsigned size_seed,
             std::bitset<BIT_SIZE> &out, unsigned size_out     );
+            
+/**
+ * \brief 
+ * \param[in] 
+ * \retval false
+ * \retval true
+ * \post La secuencia out está en orden inverso a las demás.
+ */
+int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
+            std::bitset<BIT_SIZE> seed, unsigned size_seed,
+            std::bitset<BIT_SIZE> &out, unsigned size_out     );
+            
+/**
+ * \brief 
+ * \param[in] 
+ * \retval false
+ * \retval true
+ * \post La secuencia out está en orden inverso a las demás.
+ */
+ void berlekamp_massey(std::bitset<BIT_SIZE> &sec, unsigned longitud, 
+                       unsigned &complejidad) ;
 
 #endif
 

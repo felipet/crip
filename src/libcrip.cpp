@@ -2,6 +2,7 @@
 #include <random>
 #include <chrono>
 #include <map>
+#include <tuple>
 
 
 //#define DEBUG
@@ -478,6 +479,39 @@ int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
     }
     
     return 0;
+}
+
+// ------------------------------------------------------------------
+
+int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
+           std::bitset<BIT_SIZE> seed, unsigned size_seed,
+           std::bitset<BIT_SIZE> &out, unsigned size_out) {
+ 
+    auto f = [] ()       
+}
+
+// ------------------------------------------------------------------
+
+ int berlekamp_massey(std::bitset<BIT_SIZE> &sec, unsigned longitud, 
+                       unsigned &complejidad) {
+                       
+    unsigned k = 0;
+    std::bitset<BIT_SIZE> g, aux;
+    unsigned l,a,b,r;
+     
+    if(longitud < 2) return -1;
+     
+    while(k < longitud and sec[k] != 1) ++k;
+    
+    g[longitud-1] = 1;
+    l = r = k & 0x1;
+    a = k;
+    b = 0;
+    
+    while(r < n) {
+        
+    }
+     
 }
 
 // Final fichero: libcrip.cpp
