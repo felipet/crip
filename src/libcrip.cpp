@@ -497,7 +497,7 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
                        
     unsigned k = 0;
     std::bitset<BIT_SIZE> g, aux;
-    unsigned l,a,b,r;
+    unsigned l,a,b,r,d;
      
     if(longitud < 2) return -1;
      
@@ -507,11 +507,39 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
     l = r = k & 0x1;
     a = k;
     b = 0;
+    f[longitud-1] = r;
+    f[longitud-2] = l;
     
     while(r < n) {
+        for(unsigned i = 0;i < l;i++)
+            d ^= f[longitud-i] * sec[longitud-i]; 
         
+        if(!d)
+            b++;
+            
+        if(d == 1) {
+            if(2*l > r) {
+                for(unsigned i = 0;i < l;i++)
+                    f[longitud-i] = f[longitud-i] ^ g[longitud-i+b-a];
+                b++;
+            }
+            else {
+                aux = f;
+                for(unsigned i = 0;i < r+l-1;i++)
+                    f[longitud-i] = aux[longitud-i+(a-b)] ^ g[longitud-i];
+                l = r-l+1;
+                g = aux;
+                a = b;
+                b = r-l+1;
+            }
+        }
+        r++;
     }
+    
+    sec = f;
+    complejidad = l;
      
+    return 0;
 }
 
 // Final fichero: libcrip.cpp
