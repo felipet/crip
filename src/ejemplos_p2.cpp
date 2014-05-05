@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
         ("p3,3", po::value<string>(), "Tercer postulado de Golomb")
         ("golomb,g", po::value<string>(), "Comprobar postulados de Golomb")
         ("lfsr,r", po::value<vector<string> >()->multitoken(), "LFSR")
+        ("berlekamp_massey,b", po::value<string>(), "Algoritmo Berlekamp-Massey")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -165,6 +166,29 @@ int main(int argc, char **argv) {
         auto t2 = ch::high_resolution_clock::now();
         
         cout << "\tLa cadena : " << out << endl;
+        
+        if(tiempos)
+            cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+            (t2 - t1).count() << "us" << endl;
+        
+        return 0;
+    }
+    
+    // Algoritmo Berlekamp Massey
+    if(!vm["berlekamp_massey"].empty()) {
+        string opc = vm["berlekamp_massey"].as<string>();
+        unsigned complejidad;
+        bitset<BIT_SIZE> sec(opc);
+        
+        if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+                
+        int error = berlekamp_massey(sec, opc.size(), complejidad);
+        
+        auto t2 = ch::high_resolution_clock::now();
+        
+        cout << "\tLa cadena : " << sec << endl;
+        cout << "\tComplejidad : " << complejidad << endl;
         
         if(tiempos)
             cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >

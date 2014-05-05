@@ -487,7 +487,7 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
            std::bitset<BIT_SIZE> seed, unsigned size_seed,
            std::bitset<BIT_SIZE> &out, unsigned size_out) {
  
-    auto f = [] ()       
+    return 0;      
 }
 
 // ------------------------------------------------------------------
@@ -496,36 +496,46 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
                        unsigned &complejidad) {
                        
     unsigned k = 0;
-    std::bitset<BIT_SIZE> g, aux;
-    unsigned l,a,b,r,d;
+    std::bitset<BIT_SIZE> f, g, aux;
+    unsigned l,a,b,r,d = 0;
      
     if(longitud < 2) return -1;
      
     while(k < longitud and sec[k] != 1) ++k;
+    std::cout << "\tK = " << k << std::endl;
     
     g[longitud-1] = 1;
-    l = r = k & 0x1;
+    l = r = (k + 1) % 2;
     a = k;
     b = 0;
     f[longitud-1] = r;
     f[longitud-2] = l;
+    std::cout << "\tDatos iniciales : " << std::endl;
+    std::cout << "\tg : " << g << std::endl;
+    std::cout << "\tf : " << f << std::endl;
+    std::cout << "\tr,l,a,b : " << r << "," << l << "," << a << "," << b << std::endl;
     
-    while(r < n) {
-        for(unsigned i = 0;i < l;i++)
+    
+    while(r < longitud) {
+        std::cout << "\tIteración : " << r << std::endl;
+        for(unsigned i = 0;i <= l;i++) {
+            std::cout << "\td = " << d << std::endl;
             d ^= f[longitud-i] * sec[longitud-i]; 
+        }
+        std::cout << "\td = " << d << std::endl;
         
         if(!d)
             b++;
             
         if(d == 1) {
             if(2*l > r) {
-                for(unsigned i = 0;i < l;i++)
+                for(unsigned i = 0;i <= l;i++)
                     f[longitud-i] = f[longitud-i] ^ g[longitud-i+b-a];
                 b++;
             }
             else {
                 aux = f;
-                for(unsigned i = 0;i < r+l-1;i++)
+                for(unsigned i = 0;i <= r+l-1;i++)
                     f[longitud-i] = aux[longitud-i+(a-b)] ^ g[longitud-i];
                 l = r-l+1;
                 g = aux;
@@ -534,6 +544,11 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
             }
         }
         r++;
+        
+        std::cout << "\tDatos : " << std::endl;
+    std::cout << "\tg : " << g << std::endl;
+    std::cout << "\tf : " << f << std::endl;
+    std::cout << "\tr,l,a,b : " << r << "," << l << "," << a << "," << b << std::endl;
     }
     
     sec = f;

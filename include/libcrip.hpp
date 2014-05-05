@@ -186,7 +186,7 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
  * \retval true
  * \post La secuencia out está en orden inverso a las demás.
  */
- void berlekamp_massey(std::bitset<BIT_SIZE> &sec, unsigned longitud, 
+ int berlekamp_massey(std::bitset<BIT_SIZE> &sec, unsigned longitud, 
                        unsigned &complejidad) ;
 
 #endif
