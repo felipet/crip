@@ -7,6 +7,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <fstream>
 
 using namespace std;
 namespace ch = std::chrono;
@@ -25,7 +26,9 @@ int main(int argc, char **argv) {
         ("p3,3", po::value<string>(), "Tercer postulado de Golomb")
         ("golomb,g", po::value<string>(), "Comprobar postulados de Golomb")
         ("lfsr,r", po::value<vector<string> >()->multitoken(), "LFSR")
+        ("nlfsr,n", po::value<vector<string> >()->multitoken(), "NLFSR")
         ("berlekamp_massey,b", po::value<string>(), "Algoritmo Berlekamp-Massey")
+        ("cifrar,c", po::value<vector<string> >()->multitoken(), "Cifrado en flujo usando generador de Geffe")
         ("tiempos,t", po::value<string>()->implicit_value("0"), "Devuelve tiempos de ejecución")
     ;
     
@@ -166,6 +169,72 @@ int main(int argc, char **argv) {
         auto t2 = ch::high_resolution_clock::now();
         
         cout << "\tLa cadena : " << out << endl;
+        
+        if(tiempos)
+            cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+            (t2 - t1).count() << "us" << endl;
+        
+        return 0;
+    }
+    
+    // Ejercicio3 : NLFSR
+    
+    if(!vm["nlfsr"].empty()) {
+        vector<string> opc = vm["nlfsr"].as<vector<string> >();
+        
+        if(opc.size() < 4) {
+            cout << "\t Número de parámetros incorrectos\n";
+            return 0;
+        }
+    
+        bitset<BIT_SIZE> lista_monomios(opc[0]);
+        unsigned size_lista = opc[0].size();
+        unsigned num_var;
+        istringstream (opc[1]) >> num_var;
+        bitset<BIT_SIZE> seed(opc[2]);
+        unsigned size_seed = opc[1].size();
+        unsigned k;
+        istringstream (opc[3]) >> k;
+        bitset<BIT_SIZE> sec_out;
+        
+        if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+                
+        int error = NLFSR(lista_monomios, size_lista, num_var, seed, k, sec_out);
+        
+        auto t2 = ch::high_resolution_clock::now();
+        
+        cout << "\tCadena generada: " << sec_out << endl;
+        
+        if(tiempos)
+            cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
+            (t2 - t1).count() << "us" << endl;
+        
+        return 0;
+    }
+    
+    // Cifrado en flujo de un fichero usando generador de Geffe
+    // Ejercicio2 : LFSR
+    
+    if(!vm["cifrar"].empty()) {
+        
+        vector<string> opc = vm["cifrar"].as<vector<string> >();
+        
+        if(opc.size() < 2) {
+            cout << "\t Número de parámetros incorrectos\n";
+            return 0;
+        }
+    
+        // TODO: Comprobaciones relacionadas con ficheros
+        
+        if(tiempos)
+                t1 = ch::high_resolution_clock::now(); 
+                
+        int error = cifrado_flujo(opc[1], opc[2]);
+        
+        auto t2 = ch::high_resolution_clock::now();
+        
+        cout << "\tFichero (des)cifrado " << error << endl;
         
         if(tiempos)
             cout << "\tTiempo:\t" << chrono::duration_cast<chrono::microseconds >
