@@ -3,7 +3,9 @@
 #include <chrono>
 #include <map>
 #include <tuple>
-
+#include <fstream>
+#include <string>
+#include <iostream>
 
 //#define DEBUG
 
@@ -450,10 +452,36 @@ suma_z2(std::bitset<BIT_SIZE> op1,
         
     bool a = suma.count() %2;
     
-    std::cout << "la suma es " << a << std::endl;
+    //std::cout << "la suma es " << a << std::endl;
     
     return a;
 }       
+
+// ------------------------------------------------------------------
+
+void reverse_bitset(std::bitset<BIT_SIZE> &sec, bin_size longitud) {
+    std::bitset<BIT_SIZE> aux;
+    
+    for(bin_size i = 0;i < longitud;i++) {
+        aux[i] = sec[longitud-i];
+    }
+    
+    sec = aux;
+}
+
+// ------------------------------------------------------------------
+
+namespace std{
+bitset<BIT_SIZE> op_and(bitset<BIT_SIZE> sec1, bitset<BIT_SIZE> sec2, bin_size longitud) {
+    
+    bitset<BIT_SIZE> aux;
+    
+    for(bin_size i = 0;i < longitud;i++)
+        aux[i] = sec1[i] * sec2[i];
+    
+    return aux;
+}
+}
 
 // ------------------------------------------------------------------
 
@@ -463,19 +491,19 @@ int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
             
     if(size_out >= BIT_SIZE) return -1;
     
-    out = seed;
-    out <<= 1;
-    std::cout << "out \t" << out << std::endl;
-    std::cout << "seed \t" << seed << std::endl;
+    //out = seed;
+    //out <<= 1;
+    //std::cout << "out \t" << out << std::endl;
+    //std::cout << "seed \t" << seed << std::endl;
     
     for(unsigned i = 0;i < size_out;i++) {
         out[0] = suma_z2(coefs, seed, size_coefs);
-        std::cout << "out \t" << out << std::endl;
+        //std::cout << "out \t" << out << std::endl;
         despl_izq(seed, size_seed);
         seed[0] = out[0];
         if(i < size_out - 1)
             out <<= 1;
-        std::cout << "seed \t" << seed << std::endl;
+        //std::cout << "seed \t" << seed << std::endl;
     }
     
     return 0;
@@ -483,11 +511,107 @@ int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
 
 // ------------------------------------------------------------------
 
-int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
-           std::bitset<BIT_SIZE> seed, unsigned size_seed,
-           std::bitset<BIT_SIZE> &out, unsigned size_out) {
- 
+void rango_bitset( std::bitset<BIT_SIZE> org, unsigned pos_ini, unsigned pos_fin,
+                   std::bitset<BIT_SIZE> &out) {
+    std::bitset<BIT_SIZE> aux;
+    
+    for(unsigned i = 0;i < pos_fin-pos_ini;i++)
+        aux[i] = org[i+pos_ini];
+        
+    out = aux;
+}
+
+// ------------------------------------------------------------------
+
+int NLFSR(  std::bitset<BIT_SIZE> lista_monomios,
+            unsigned size_lista,
+            unsigned num_variables,
+            std::bitset<BIT_SIZE> semilla,
+            unsigned k,
+            std::bitset<BIT_SIZE> &sec_out)                      {
+    
+    std::bitset<BIT_SIZE> aux;
+    unsigned cont = 0;
+    
+    for(unsigned i = 0;i < k;i++) {
+        std::bitset<BIT_SIZE> temp;
+            for(unsigned j = 0;j < size_lista;j++) {
+                // TODO: la lista_monomios se lee al revés
+                rango_bitset(lista_monomios, cont, cont+4, temp);
+                
+                std::cout << "temp generado : \t\t" << temp << std::endl;
+                
+                temp ^= semilla;
+            
+                std::cout << "temp + semilla : \t\t" << temp << std::endl;
+            
+                cont += 4;  
+            }
+        
+        cont = 0;
+        aux = temp.count() % 2;
+        aux <<= 1;
+    }
+    
+    sec_out = aux;
+     
     return 0;      
+}
+
+// ------------------------------------------------------------------
+
+
+int cifrado_flujo(std::string in_file, std::string out_file) {
+    if(out_file.empty())    return -2;
+    
+    char line[BIT_SIZE];
+    std::ifstream input(in_file);
+    // TODO: NO ABRE ESTE PUTO ARCHIVO
+    //if(!input.is_open()) return -1;
+    std::fstream output(out_file, std::fstream::out | std::fstream::trunc);
+    std::bitset<BIT_SIZE> lfsr1, lfsr2, lfsr3;
+    unsigned size1, size2, size3, size_m;
+    
+    LFSR( std::bitset<BIT_SIZE>("1111"), 4, std::bitset<BIT_SIZE>("1101"),
+          4,lfsr1, 5); // D4+D3+D2+D+1 con semilla 1101, período 5
+    LFSR( std::bitset<BIT_SIZE>("1010"), 4, std::bitset<BIT_SIZE>("1001"),
+          4,lfsr2, 6); // D4+D2+1 con semilla 1001, período 6
+    LFSR( std::bitset<BIT_SIZE>("1010"), 4, std::bitset<BIT_SIZE>("1101"),
+          4,lfsr3, 3); // D4+D2+1 con semilla 1101, período 3
+          
+    std::cout << "lfsr1 " << lfsr1 << std::endl;
+    std::cout << "lfsr2 " << lfsr2 << std::endl;
+    std::cout << "lfsr3 " << lfsr3 << std::endl;
+    
+    while( input.getline(line, BIT_SIZE, '\n') ) {
+        std::bitset<BIT_SIZE> msg(line);
+        int error = generador_Geffe(lfsr1, lfsr2, lfsr3, std::max(std::max      
+                    (size1, size2),size3), msg, size_m);
+        if(error > 0) return -3;
+        output << msg.to_string() << "\n";
+    }
+    
+    output.close();
+    input.close();
+    
+    return 0;
+}
+
+// ------------------------------------------------------------------
+
+ int generador_Geffe( std::bitset<BIT_SIZE> lfsr1, 
+                      std::bitset<BIT_SIZE> lfsr2, 
+                      std::bitset<BIT_SIZE> lfsr3, unsigned size_max,
+                      std::bitset<BIT_SIZE> &msg, unsigned size_m ) {
+    
+    //TODO: Comprobar que size_max están dentro de rangos...
+          
+    std::bitset<BIT_SIZE> temp1 = op_and(lfsr1,lfsr2, size_max);
+    std::bitset<BIT_SIZE> temp2 = op_and(~lfsr2, lfsr3, size_max);
+    std::bitset<BIT_SIZE> temp3 = temp1^temp2;
+    std::cout << "temp 3 " << temp3 << std::endl;
+    
+    return 0;
 }
 
 // ------------------------------------------------------------------
@@ -518,36 +642,58 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
     
     while(r < longitud) {
         std::cout << "\tIteración : " << r << std::endl;
-        for(unsigned i = 0;i <= l;i++) {
-            std::cout << "\td = " << d << std::endl;
-            d ^= f[longitud-i] * sec[longitud-i]; 
-        }
-        std::cout << "\td = " << d << std::endl;
+        d = 0;
         
-        if(!d)
+        std::bitset<BIT_SIZE> q(f), t("11001000111101");
+        reverse_bitset(q, longitud);
+        q >>= 1;
+        //reverse_bitset(t, longitud);
+        //t = "11001000111101";
+        std::cout << "\tq : " << q << std::endl;
+        std::cout << "\tt : " << t << std::endl;
+        for(unsigned i = 0;i <= l;i++) {
+            //d += f[longitud-i] * sec[longitud-i+r-l]; 
+            d += q[i] * t[i+r-l];
+            std::cout << "\td = " << d << std::endl;
+        }
+        d = d%2;
+        
+        if(!d) {
             b++;
+            std::cout << "\t\tD==0" << std::endl;
+        }
             
         if(d == 1) {
-            if(2*l > r) {
+            if((l<<1) > r) {
+                /*
                 for(unsigned i = 0;i <= l;i++)
                     f[longitud-i] = f[longitud-i] ^ g[longitud-i+b-a];
+                */
+                f = f ^ (g << (b-a));
                 b++;
+                std::cout << "\t\tD==1 and 1" << std::endl;
             }
             else {
                 aux = f;
+                std::cout << "\taux : \t" << aux << std::endl;
+                /*
                 for(unsigned i = 0;i <= r+l-1;i++)
                     f[longitud-i] = aux[longitud-i+(a-b)] ^ g[longitud-i];
-                l = r-l+1;
-                g = aux;
+                */
+                f = aux ^ (g << (b-a) );
+                l = r+1-l;
+                g = aux << 1;
                 a = b;
-                b = r-l+1;
+                b = r+1-l;
+                
+                std::cout << "\t\tD==1 and 2" << std::endl;
             }
         }
         r++;
         
         std::cout << "\tDatos : " << std::endl;
-    std::cout << "\tg : " << g << std::endl;
-    std::cout << "\tf : " << f << std::endl;
+    std::cout << "\tg : \t" << g << std::endl;
+    std::cout << "\tf : \t" << f << std::endl;
     std::cout << "\tr,l,a,b : " << r << "," << l << "," << a << "," << b << std::endl;
     }
     

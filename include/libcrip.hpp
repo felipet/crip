@@ -169,16 +169,41 @@ int LFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
             std::bitset<BIT_SIZE> &out, unsigned size_out     );
             
 /**
- * \brief 
- * \param[in] 
- * \retval false
- * \retval true
- * \post La secuencia out está en orden inverso a las demás.
+ * \brief Registro no lineal de desplazamiento
+ * \param[in] lista_monomios Array de bits donde se indican los coeficientes
+ * para cada monomio.
+ * \param[in] num_variables Indica cuantas variables se utilizan en el polinomio
+ * \param[in] size_lista Inidia cuantas posiciones se utilizan de lista_monomios
+ * \param[in] semilla Secuencia semilla para el NLFSR
+ * \param[in] k Entero que indica la longitud de la secuencia de salida
+ * \param[out] sec_out Secuencia binaria generada por el NLFSR
+ * \pre k > 0
+ * \pre num_variables > 0
  */
-int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs, 
-            std::bitset<BIT_SIZE> seed, unsigned size_seed,
-            std::bitset<BIT_SIZE> &out, unsigned size_out     );
-            
+int NLFSR(  std::bitset<BIT_SIZE> lista_monomios,
+            unsigned size_lista,
+            unsigned num_variables,
+            std::bitset<BIT_SIZE> semilla,
+            unsigned k,
+            std::bitset<BIT_SIZE> &sec_out);
+/**
+ * \brief Generador de Geffe
+ * \param[in] lfsr1 Secuencia binaria para el LFSR 1
+ * \param[in] lfsr2 Secuencia binaria para el LFSR 2
+ * \param[in] lfsr3 Secuencia binaria para el LFSR 3
+ * \param[in,out] msg Secuencia binaria donde entra el mensaje en plano y sale
+ * cifrado.
+ * \param[in] size_1 Tamaño ocupado por la sencuencia para el LFSR 1
+ * \param[in] size_2 Tamaño ocupado por la sencuencia para el LFSR 2
+ * \param[in] size_3 Tamaño ocupado por la sencuencia para el LFSR 3
+ * \param[in] size_msg Tamaño ocupado por la sencuencia para el mensaje
+ * \return Código de error
+ */
+int generador_Geffe( std::bitset<BIT_SIZE> lfsr1,
+                     std::bitset<BIT_SIZE> lfsr2,
+                     std::bitset<BIT_SIZE> lfsr3, unsigned size_max,
+                     std::bitset<BIT_SIZE> &msg, unsigned size_m );
+                      
 /**
  * \brief 
  * \param[in] 
@@ -186,8 +211,17 @@ int NLFSR(  std::bitset<BIT_SIZE> coefs, unsigned size_coefs,
  * \retval true
  * \post La secuencia out está en orden inverso a las demás.
  */
- int berlekamp_massey(std::bitset<BIT_SIZE> &sec, unsigned longitud, 
-                       unsigned &complejidad) ;
+int cifrado_flujo(std::string in_file, std::string out_file);
+       
+/**
+ * \brief 
+ * \param[in] 
+ * \retval false
+ * \retval true
+ * \post La secuencia out está en orden inverso a las demás.
+ */
+int berlekamp_massey(std::bitset<BIT_SIZE> &sec, unsigned longitud, 
+                     unsigned &complejidad) ;
 
 #endif
 
