@@ -22,17 +22,47 @@ def lfsr(p_conexion, semilla, size_out):
     
     return out
 
+def cifrado_flujo(fichero):
+    """Cifrado en flujo usando el generador de Geffe"""
+    
+    # La complejidad lineal del conjunto sería mcm(4,5,3)
+    # Asumo que las líneas del fichero son de 32 caracteres
+    r1 = bv.BitVector( bitstring = "1010")
+    r2 = bv.BitVector( bitstring = "10101")
+    r3 = bv.BitVector( bitstring = "110")
+    s1 = bv.BitVector( bitstring = "1001")
+    s2 = bv.BitVector( bitstring = "10110")
+    s3 = bv.BitVector( bitstring = "101")
+    
+    cadena1 = lfsr(r1, s1, 32)
+    cadena2 = lfsr(r2, s2, 32)
+    cadena3 = lfsr(r3, s3, 32)
+    
+    temp1 = cadena1 & cadena2
+    temp2 = ~cadena2 & cadena3
+    key = temp1 ^ temp2       # Esta es la clave
+    
+    f = open(fichero, 'r')
+    
+    for line in f:
+        cad = bv.BitVector( bitstring = line.rstrip() )
+        cad = cad ^ key
+        print(cad)
+        
 
+    
 
 def main():
-    coefs = str((input("Introducir los coefs del c(D): ")))
-    coeficientes = bv.BitVector( bitstring = coefs )
-    seed = str((input("Introducir cadena de semilla: ")))
-    semilla = bv.BitVector( bitstring = seed )
-    k = int((input("Introducir longitud de salida: ")))
-    
-    resultados = lfsr(coeficientes, semilla, k)
-    print(resultados)
+#    coefs = str((input("Introducir los coefs del c(D): ")))
+#    coeficientes = bv.BitVector( bitstring = coefs )
+#    seed = str((input("Introducir cadena de semilla: ")))
+#    semilla = bv.BitVector( bitstring = seed )
+#    k = int((input("Introducir longitud de salida: ")))
+#    
+#    resultados = lfsr(coeficientes, semilla, k)
+#    print(resultados)
+    filename = str((input("Introducir el nombre del fichero: ")))
+    cifrado_flujo(filename)
 
 if __name__ == '__main__':
     main()
